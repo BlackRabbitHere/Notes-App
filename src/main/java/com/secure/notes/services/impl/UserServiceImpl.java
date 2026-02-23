@@ -11,6 +11,8 @@ import com.secure.notes.repositories.RoleRepository;
 import com.secure.notes.repositories.UserRepository;
 import com.secure.notes.services.UserService;
 import com.secure.notes.utils.EmailService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +25,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Transactional
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     @Value("${frontend.url}")
@@ -189,6 +193,19 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User registerUser(User newUser) {
+        if (newUser.getPassword() != null) {
+            newUser.setPassword(passwordEncoder.encode(newUser.getPassword()));
+        }
+
+        return userRepository.save(newUser);
+    }
 
 
 }
